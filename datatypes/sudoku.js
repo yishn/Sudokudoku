@@ -78,7 +78,7 @@ class Sudoku {
 
     solve() {
         let emptyVertices = grid.filter(v => this.arrangement[v] == null)
-        if (emptyVertices.length == 0) return this
+        if (emptyVertices.length == 0 && !this.hasContradictions()) return this
 
         for (let vertex of emptyVertices) {
             let neighbor = this.clone()
@@ -98,6 +98,41 @@ class Sudoku {
 
         return null
     }
+}
+
+Sudoku.generatePuzzle = function() {
+    let puzzle = new Sudoku().solve()
+    let i = 0
+
+    for (let vertex of grid) {
+        let number = puzzle.arrangement[vertex]
+        let boxes = puzzle.getBoxes(vertex)
+        let feasible = true
+
+        if (boxes.some(box => box.filter(v => puzzle.arrangement[v] != null).length < 4)) {
+            feasible = false
+        }
+
+        if (!feasible) continue
+
+        for (let n = 1; n <= 9; n++) {
+            if (n === number) continue
+            puzzle.arrangement[vertex] = n
+
+            if (puzzle.solve() != null) {
+                feasible = false
+                break
+            }
+        }
+
+        if (feasible) i++
+        puzzle.arrangement[vertex] = feasible ? null : number
+
+        console.log(vertex, feasible, i)
+        if (i >= 50) break
+    }
+
+    return puzzle
 }
 
 module.exports = Sudoku
