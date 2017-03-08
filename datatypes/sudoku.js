@@ -76,35 +76,28 @@ class Sudoku {
         return result
     }
 
-    toString() {
-        return JSON.stringify(this.arrangement)
-    }
-}
+    solve() {
+        let emptyVertices = grid.filter(v => this.arrangement[v] == null)
+        if (emptyVertices.length == 0) return this
 
-Sudoku.generateRandomSolution = function(sudoku = null) {
-    if (sudoku == null) sudoku = new Sudoku()
+        for (let vertex of emptyVertices) {
+            let neighbor = this.clone()
 
-    let emptyVertices = grid.filter(v => sudoku.arrangement[v] == null)
-    if (emptyVertices.length == 0) return sudoku
+            for (let number of shuffle(range(9).map(i => i + 1))) {
+                neighbor.arrangement[vertex] = number
+                if (neighbor.hasContradictions()) continue
 
-    for (let vertex of emptyVertices) {
-        let neighbor = sudoku.clone()
-        let shuffled = shuffle(range(9).map(i => i + 1))
+                let result = neighbor.solve()
+                if (result != null) return result
 
-        for (let number of shuffled) {
-            neighbor.arrangement[vertex] = number
-            if (neighbor.hasContradictions()) continue
+                neighbor.arrangement[vertex] = null
+            }
 
-            let result = Sudoku.generateRandomSolution(neighbor)
-            if (result != null) return result
-
-            neighbor.arrangement[vertex] = null
+            return null
         }
 
         return null
     }
-
-    return null
 }
 
 module.exports = Sudoku
