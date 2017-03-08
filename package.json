@@ -1,0 +1,35 @@
+{
+  "name": "sudokudoku",
+  "version": "0.1.0",
+  "description": "Generate Sudoku, play Sudoku!",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yishn/Sudokudoku.git"
+  },
+  "keywords": [
+    "sudoku",
+    "puzzle",
+    "game"
+  ],
+  "author": "Yichuan Shen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yishn/Sudokudoku/issues"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.22.0",
+    "babelify": "^7.3.0",
+    "browserify": "^14.1.0",
+    "uglify-js": "^2.8.9",
+    "watchify": "^3.9.0"
+  },
+  "dependencies": {
+    "preact": "^7.2.0"
+  },
+  "scripts": {
+    "watch": "watchify -t [ babelify --presets [ es2015 ] ] index.js -o bundle.js",
+    "bundle": "browserify -t [ babelify --presets [ es2015 ] ] index.js -o bundle.js",
+    "build": "browserify -t [ babelify --presets [ es2015 ] ] index.js | uglifyjs -m -c > bundle.js"
+  }
+}
