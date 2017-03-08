@@ -1,5 +1,50 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
+
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    box-sizing: content-box;
 }
+
+body {
+    background: #FFECB1;
+    font: 100%/1.5 Raleway, sans-serif;
+}
+
+#sudoku-grid {
+        display: table;
+        margin: 2em auto;
+        border: 1em solid #A26E68;
+        padding: 3px;
+    }
+    #sudoku-grid ol {
+        list-style: none;
+    }
+    #sudoku-grid ol:nth-child(3), #sudoku-grid ol:nth-child(6) {
+        border-bottom: 3px solid #FFECB1;
+    }
+    #sudoku-grid ol li {
+        display: inline-block;
+    }
+    #sudoku-grid ol li:nth-child(3), #sudoku-grid ol li:nth-child(6) {
+        border-right: 3px solid #FFECB1;
+    }
+    #sudoku-grid ol li div {
+        width: 1.6em;
+        height: 1.6em;
+        background: #FFC09C;
+        font-size: 2em;
+        line-height: 1.6;
+        text-align: center;
+        cursor: pointer;
+        transition: background .2s;
+    }
+    #sudoku-grid ol li div:hover {
+        background: #FF9386;
+    }
+    #sudoku-grid ol li.solid div {
+        background: #A26E68;
+        font-weight: bold;
+        color: #FFECB1;
+        cursor: default;
+    }
