@@ -23,10 +23,27 @@ class Sudoku {
         return new Sudoku(this.arrangement)
     }
 
-    isValid() {
-        return this.getBoxes().every(box =>
-            !hasDuplicates(box.map(v => this.arrangement[v]).filter(x => x != null))
+    hasContradictions() {
+        return this.getBoxes().some(box =>
+            hasDuplicates(box.map(v => this.arrangement[v]).filter(x => x != null))
         )
+    }
+
+    getContradiction() {
+        for (let box of this.getBoxes()) {
+            for (let v of box) {
+                if (this.arrangement[v] == null) continue
+
+                for (let w of box) {
+                    if (equals(v)(w) || this.arrangement[v] !== this.arrangement[w])
+                        continue
+
+                    return [v, w]
+                }
+            }
+        }
+
+        return null
     }
 
     getBoxes(vertex = null) {
@@ -76,7 +93,7 @@ Sudoku.generateRandomSolution = function(sudoku = null) {
 
         for (let number of shuffled) {
             neighbor.arrangement[vertex] = number
-            if (!neighbor.isValid()) continue
+            if (neighbor.hasContradictions()) continue
 
             let result = Sudoku.generateRandomSolution(neighbor)
             if (result != null) return result
