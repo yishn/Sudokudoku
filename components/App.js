@@ -1,21 +1,29 @@
 const {h, Component} = require('preact')
-const SudokuGrid = require('./SudokuGrid')
 const Sudoku = require('../datatypes/sudoku')
+
+const Throbber = require('./Throbber')
+const SudokuGrid = require('./SudokuGrid')
 
 class App extends Component {
     constructor() {
         super()
-        
+
         this.state = {
-            sudoku: Sudoku.generatePuzzle()
+            loading: true,
+            sudoku: null
         }
     }
 
-    render(_, {sudoku}) {
-        return h(SudokuGrid, {
-            app: this,
-            sudoku
-        })
+    render(_, {loading, sudoku}) {
+        return h('section', {id: 'root'},
+            loading
+            ? h(Throbber)
+            : h(SudokuGrid, {
+                app: this,
+                sudoku
+            })
+        )
+
     }
 }
 
