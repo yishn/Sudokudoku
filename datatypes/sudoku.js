@@ -88,7 +88,8 @@ class Sudoku {
         return result
     }
 
-    solve() {
+    solve(options = {}) {
+        let {timeout = Infinity, startTime = Date.now()} = options
         let noEmptyVertices = true
 
         for (let vertex of _grid) {
@@ -101,7 +102,10 @@ class Sudoku {
                 neighbor.set(vertex, number + 1)
                 if (neighbor.hasContradictions()) continue
 
-                let result = neighbor.solve()
+                if (Date.now() - startTime > timeout)
+                    throw new Error('Timeout')
+
+                let result = neighbor.solve(options)
                 if (result != null) return result
 
                 neighbor.set(vertex, null)
@@ -118,7 +122,7 @@ class Sudoku {
 Sudoku.vertexEquals = v => w => v[0] === w[0] && v[1] === w[1]
 
 Sudoku.generatePuzzle = function(options = {}) {
-    let {timeout = 5000, sparsity = -1, givens = 0} = options
+    let {timeout = Infinity, givens = 0} = options
     let puzzle = new Sudoku().solve()
     let notEmpty = v => puzzle.get(v) != null
     let startTime = Date.now()
@@ -129,9 +133,6 @@ Sudoku.generatePuzzle = function(options = {}) {
         let boxes = puzzle.getBoxes(vertex)
         let feasible = boxes.some(box => box.filter(notEmpty).length === 9)
 
-        if (boxes.some(box => box.filter(notEmpty).length <= sparsity))
-            continue
-
         if (!feasible) {
             // Check for multiple solutions
 
@@ -141,7 +142,13 @@ Sudoku.generatePuzzle = function(options = {}) {
                 if (n + 1 === number) continue
                 puzzle.set(vertex, n + 1)
 
-                if (Date.now() - startTime > timeout || puzzle.solve() != null) {
+                try {
+                    feasible = puzzle.solve({timeout: 500}) == null
+                } catch (err) {
+                    feasible = false
+                }
+
+                if (!feasible || Date.now() - startTime > timeout) {
                     feasible = false
                     break
                 }
