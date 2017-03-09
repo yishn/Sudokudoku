@@ -18,8 +18,8 @@ body {
 #sudoku-grid {
         display: table;
         margin: 2em auto;
-        border: 1em solid #A26E68;
         padding: 3px;
+        border: 1em solid #A26E68;
     }
     #sudoku-grid ol {
         list-style: none;
@@ -47,8 +47,8 @@ body {
         background: #FF9386;
     }
     #sudoku-grid ol li.solid div {
-        background: #A26E68;
+        background: #FFECB1;
         font-weight: bold;
-        color: #FFECB1;
+        color: #4B464A;
         cursor: default;
-    }
+}

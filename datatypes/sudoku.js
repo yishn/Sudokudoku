@@ -5,6 +5,7 @@ let equals = v => w => v[0] === w[0] && v[1] === w[1]
 let random = n => Math.floor(Math.random() * n)
 let swap = (arr, i, j) => ([arr[i], arr[j]] = [arr[j], arr[i]])
 let shuffle = arr => (range(arr.length).map(i => arr.length - i).forEach(i => swap(arr, i - 1, random(i))), arr)
+
 let grid = makeTuples(range(9))
 
 class Sudoku {
