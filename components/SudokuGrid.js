@@ -2,9 +2,9 @@ const {h, Component} = require('preact')
 const Sudoku = require('../datatypes/sudoku')
 
 class SudokuGrid extends Component {
-    render({app, sudoku}) {
-        let contradiction = sudoku.getContradiction()
-        let markup = sudoku.getTrivialMarkup()
+    render({app, puzzle}) {
+        let contradiction = puzzle.getContradiction()
+        let markup = puzzle.getTrivialMarkup()
 
         return h('section', {id: 'sudoku-grid'},
             [...Array(9)].map((_, y) => h('ol', {},
@@ -12,26 +12,26 @@ class SudokuGrid extends Component {
                     {
                         class: {
                             [`pos-${x}-${y}`]: true,
-                            'solid': sudoku.solids.some(Sudoku.vertexEquals([x, y])),
+                            'solid': puzzle.solids.some(Sudoku.vertexEquals([x, y])),
                             'contradiction': contradiction.some(Sudoku.vertexEquals([x, y]))
                         }
                     },
-                    sudoku.get([x, y]) != null
-                    ? h('div', {class: 'number'}, sudoku.get([x, y]))
+                    puzzle.get([x, y]) != null
+                    ? h('div', {class: 'number'}, puzzle.get([x, y]))
                     : h('ul',
                         {
                             class: 'markup',
                             onclick: () => {
                                 if (markup[y][x].length == 1) {
-                                    sudoku.set([x, y], markup[y][x][0])
-                                    app.setState({sudoku})
+                                    puzzle.set([x, y], markup[y][x][0])
+                                    app.setState({puzzle})
                                 }
                             }
                         },
                         [...Array(9)].map((_, i) => i + 1).map(i => h('li', {
                             class: {
                                 'excluded': !markup[y][x].includes(i)
-                                    || sudoku.excluded[y][x].includes(i)
+                                    || puzzle.excluded[y][x].includes(i)
                             }
                         }, i))
                     )

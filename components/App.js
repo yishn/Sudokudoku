@@ -9,18 +9,24 @@ class App extends Component {
         super()
 
         this.state = {
-            loading: true,
-            sudoku: null
+            puzzle: null
         }
     }
 
-    render(_, {loading, sudoku}) {
+    componentDidMount() {
+        setTimeout(() => {
+            let puzzle = Sudoku.generatePuzzle()
+            this.setState({puzzle})
+        }, 1000)
+    }
+
+    render(_, {puzzle}) {
         return h('section', {id: 'root'},
-            loading
+            puzzle == null
             ? h(Throbber)
             : h(SudokuGrid, {
                 app: this,
-                sudoku
+                puzzle
             })
         )
 

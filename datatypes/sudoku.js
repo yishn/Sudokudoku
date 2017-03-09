@@ -158,7 +158,6 @@ Sudoku.generatePuzzle = function(options = {}) {
         puzzle.set(vertex, feasible ? null : number)
 
         if (feasible) i++
-        console.log(vertex, feasible, i)
         if (i >= 81 - givens) break
     }
 
