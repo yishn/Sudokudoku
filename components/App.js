@@ -14,7 +14,7 @@ class App extends Component {
             puzzle: null,
 
             cellEditorPosition: [0, 0],
-            editMode: null
+            editVertex: null
         }
     }
 
@@ -39,6 +39,11 @@ class App extends Component {
     }
 
     render(_, state) {
+        let markup = state.puzzle ? state.puzzle.getCurrentMarkup() : null
+        let numbers = [...Array(9)].map((_, i) => i + 1)
+
+        let getExcluded = ([x, y]) => numbers.filter(i => !markup[y][x].includes(i))
+
         return h('section', {id: 'root'},
             state.puzzle == null
             ? h(Throbber, {
@@ -56,17 +61,17 @@ class App extends Component {
 
                     this.setState({
                         cellEditorPosition: [left, top],
-                        editMode: [x, y]
+                        editVertex: [x, y]
                     })
                 }
             }),
             h(CellEditor, {
-                excluded: [2, 3, 9],
+                excluded: state.editVertex ? getExcluded(state.editVertex) : [],
                 position: state.cellEditorPosition,
-                show: state.editMode != null,
+                show: state.editVertex != null,
 
                 onSubmit: evt => {
-                    this.setState({editMode: null})
+                    this.setState({editVertex: null})
                 }
             })
         )

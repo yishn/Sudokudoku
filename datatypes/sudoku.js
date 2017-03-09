@@ -49,6 +49,10 @@ class Sudoku {
         return this.getBoxes().some(this.hasContradictions.bind(this))
     }
 
+    getGrid() {
+        return _grid
+    }
+
     getContradiction() {
         for (let box of this.getBoxes()) {
             for (let v of box) {
@@ -74,7 +78,7 @@ class Sudoku {
     getTrivialMarkup() {
         let result = [...Array(9)].map(_ => Array(9).fill(null))
 
-        for (let [x, y] of _grid) {
+        for (let [x, y] of this.getGrid()) {
             result[y][x] = range9.map(i => i + 1)
 
             for (let box of this.getBoxes([x, y])) {
@@ -88,11 +92,21 @@ class Sudoku {
         return result
     }
 
+    getCurrentMarkup() {
+        let markup = this.getTrivialMarkup()
+
+        for (let [x, y] of this.getGrid()) {
+            markup[y][x] = markup[y][x].filter(i => !this.excluded[y][x].includes(i))
+        }
+
+        return markup
+    }
+
     solve(options = {}) {
         let {timeout = Infinity, startTime = Date.now()} = options
         let noEmptyVertices = true
 
-        for (let vertex of _grid) {
+        for (let vertex of this.getGrid()) {
             if (this.get(vertex) != null) continue
 
             let neighbor = this.clone()
@@ -122,14 +136,14 @@ class Sudoku {
 Sudoku.vertexEquals = v => w => v[0] === w[0] && v[1] === w[1]
 
 Sudoku.generatePuzzle = function(options = {}) {
-    let {timeout = Infinity, givens = 0, onProgress = () => {}} = options
+    let {timeout = 500, givens = 0, onProgress = () => {}} = options
     let puzzle = new Sudoku().solve()
     let notEmpty = v => puzzle.get(v) != null
     let startTime = Date.now()
     let i = 0
     let n = 0
 
-    for (let vertex of shuffle([..._grid])) {
+    for (let vertex of shuffle([...puzzle.getGrid()])) {
         let number = puzzle.get(vertex)
         let boxes = puzzle.getBoxes(vertex)
         let feasible = boxes.some(box => box.filter(notEmpty).length === 9)
@@ -161,10 +175,10 @@ Sudoku.generatePuzzle = function(options = {}) {
         if (feasible) i++
         if (i >= 81 - givens) break
 
-        onProgress(++n / _grid.length)
+        onProgress(++n / puzzle.getGrid().length)
     }
 
-    puzzle.solids = _grid.filter(v => puzzle.get(v) != null)
+    puzzle.solids = puzzle.getGrid().filter(v => puzzle.get(v) != null)
 
     return puzzle
 }

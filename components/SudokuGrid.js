@@ -4,7 +4,7 @@ const Sudoku = require('../datatypes/sudoku')
 class SudokuGrid extends Component {
     render({puzzle, onCellClick = () => {}}) {
         let contradiction = puzzle.getContradiction()
-        let markup = puzzle.getTrivialMarkup()
+        let markup = puzzle.getCurrentMarkup()
 
         return h('section', {id: 'sudoku-grid'},
             [...Array(9)].map((_, y) => h('ol', {},
@@ -30,7 +30,6 @@ class SudokuGrid extends Component {
                         [...Array(9)].map((_, i) => i + 1).map(i => h('li', {
                             class: {
                                 'excluded': !markup[y][x].includes(i)
-                                    || puzzle.excluded[y][x].includes(i)
                             }
                         }, i))
                     )
