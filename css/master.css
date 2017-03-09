@@ -13,51 +13,88 @@
 body {
     background: #FFECB1;
     font: 100%/1.5 Raleway, sans-serif;
+    color: #333;
 }
 
 #sudoku-grid {
         display: table;
         margin: 2em auto;
-        padding: 3px;
+        padding: 5px;
         border: 1em solid #A26E68;
     }
     #sudoku-grid ol {
         list-style: none;
         overflow: hidden;
+        border-bottom: 2px solid #FFECB1;
+    }
+    #sudoku-grid ol:last-child {
+        border-bottom: 0;
     }
     #sudoku-grid ol:nth-child(3), #sudoku-grid ol:nth-child(6) {
-        border-bottom: 3px solid #FFECB1;
+        border-bottom: 5px solid #FFECB1;
     }
-    #sudoku-grid ol li {
+    #sudoku-grid ol > li {
         display: block;
         float: left;
+        border-right: 2px solid #FFECB1;
     }
-    #sudoku-grid ol li:nth-child(3), #sudoku-grid ol li:nth-child(6) {
-        border-right: 3px solid #FFECB1;
+    #sudoku-grid ol > li:last-child {
+        border-right: 0;
     }
-    #sudoku-grid ol li div {
-        width: 1.6em;
-        height: 1.6em;
+    #sudoku-grid ol > li:nth-child(3), #sudoku-grid ol > li:nth-child(6) {
+        border-right: 5px solid #FFECB1;
+    }
+    #sudoku-grid ol > li {
         background: #FFC09C;
-        font-size: 2em;
-        line-height: 1.6;
-        text-align: center;
+        position: relative;
+        width: 3.4em;
+        height: 3.4em;
         cursor: pointer;
         transition: background .2s;
     }
-    #sudoku-grid ol li div:hover {
+    #sudoku-grid ol > li:hover {
         background: #FF9386;
     }
-    #sudoku-grid ol li.solid div {
+    #sudoku-grid ol > li .number, #sudoku-grid ol > li .markup {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+    }
+    #sudoku-grid ol > li .number {
+        font-size: 2em;
+        line-height: 1.7;
+        text-align: center;
+    }
+    #sudoku-grid ol > li.solid {
         background: #FFECB1;
-        font-weight: bold;
-        color: #4B464A;
         cursor: default;
     }
-    #sudoku-grid ol li.highlight div {
+    #sudoku-grid ol > li.solid .number {
+        font-weight: bold;
+        color: #4B464A;
+    }
+    #sudoku-grid ol > li.highlight {
         background: #FF9386;
     }
-    #sudoku-grid ol li.contradiction div {
+    #sudoku-grid ol > li.contradiction {
         background: #E3423E;
         color: #FFECB1;
+    }
+    #sudoku-grid ol > li .markup {
+        list-style: none;
+        overflow: hidden;
+    }
+    #sudoku-grid ol > li .markup li {
+        display: table-cell;
+        vertical-align: middle;
+        width: 33.33%;
+        height: 33.33%;
+        float: left;
+        font-size: .8em;
+        text-align: center;
+    }
+    #sudoku-grid ol > li .markup li.excluded {
+        visibility: hidden;
     }

@@ -30,7 +30,9 @@ class Sudoku {
     }
 
     clone() {
-        return new Sudoku(this.arrangement)
+        let puzzle = new Sudoku(this.arrangement)
+        puzzle.solids = this.solids
+        return puzzle
     }
 
     hasContradictions() {
@@ -104,7 +106,7 @@ class Sudoku {
 Sudoku.vertexEquals = v => w => v[0] === w[0] && v[1] === w[1]
 
 Sudoku.generatePuzzle = function(options = {}) {
-    let {timeout = 2000, sparsity = 3, maximum = 50} = options
+    let {timeout = 2000, sparsity = 3, givens = 31} = options
     let puzzle = new Sudoku().solve()
     let notEmpty = v => puzzle.arrangement[v] != null
     let startTime = Date.now()
@@ -138,7 +140,7 @@ Sudoku.generatePuzzle = function(options = {}) {
 
         if (feasible) i++
         console.log(vertex, feasible, i)
-        if (i >= maximum) break
+        if (i >= 81 - givens) break
     }
 
     puzzle.solids = _grid.filter(v => puzzle.arrangement[v] != null)
