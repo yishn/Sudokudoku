@@ -150,8 +150,6 @@ body {
         overflow: hidden;
     }
     #sudoku-grid ol > li .markup li {
-        display: table-cell;
-        vertical-align: middle;
         width: 33.33%;
         height: 33.33%;
         float: left;
@@ -160,4 +158,88 @@ body {
     }
     #sudoku-grid ol > li .markup li.excluded {
         visibility: hidden;
+}
+
+/* CellEditor */
+
+#cell-editor {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        transition: opacity .2s;
+        pointer-events: none;
+    }
+    #cell-editor.show {
+        opacity: 1;
+        pointer-events: inherit;
+}
+
+#cell-editor .inner {
+        position: absolute;
+        width: 6em;
+        height: 6em;
+        margin-top: -3em;
+        margin-left: -3em;
+        border: 5px solid #4B464A;
+        background: #4B464A;
+        color: white;
+        opacity: .95;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, .3);
+        transform: scale(0.6);
+        transition: transform .2s;
+    }
+    #cell-editor.show .inner {
+        transform: scale(1);
+    }
+    #cell-editor .inner ul {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        list-style: none;
+        overflow: hidden;
+    }
+    #cell-editor .inner li {
+        position: relative;
+        float: left;
+        width: 33.33%;
+        height: 33.33%;
+        line-height: 2;
+        text-align: center;
+        cursor: pointer;
+        transition: background .2s, color .2s;
+    }
+    #cell-editor .inner li::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: calc(50% - 1px);
+        left: 15%;
+        width: 70%;
+        height: 2px;
+        background: #6D686C;
+        opacity: 0;
+        transition: background .2s, opacity .2s;
+        transform: rotate(-40deg);
+        pointer-events: none;
+    }
+    #cell-editor .inner li:hover {
+        background: #6D686C;
+    }
+    #cell-editor .inner li.excluded {
+        color: #6D686C;
+    }
+    #cell-editor .inner li.excluded::before {
+        opacity: 1;
+    }
+    #cell-editor .inner li.excluded:hover {
+        color: #8F8A8E;
+    }
+    #cell-editor .inner li.excluded:hover::before {
+        background: #8F8A8E;
 }

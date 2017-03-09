@@ -3,6 +3,7 @@ const Sudoku = require('../datatypes/sudoku')
 
 const Throbber = require('./Throbber')
 const SudokuGrid = require('./SudokuGrid')
+const CellEditor = require('./CellEditor')
 
 class App extends Component {
     constructor() {
@@ -10,7 +11,8 @@ class App extends Component {
 
         this.state = {
             loadingProgress: 0,
-            puzzle: null
+            puzzle: null,
+            editMode: false
         }
     }
 
@@ -31,19 +33,30 @@ class App extends Component {
             }
         })
 
-        worker.postMessage('')
+        worker.postMessage(null)
     }
 
-    render(_, {loadingProgress, puzzle}) {
+    render(_, state) {
         return h('section', {id: 'root'},
-            puzzle == null
-            ? h(Throbber, {loadingProgress})
+            state.puzzle == null
+            ? h(Throbber, {
+                progress: state.loadingProgress
+            })
             : h(SudokuGrid, {
                 app: this,
-                puzzle
+                puzzle: state.puzzle
+            }),
+            h(CellEditor, {
+                excluded: [2, 3, 9],
+                position: [438, 252],
+                show: state.editMode,
+
+                onSubmit: ({data}) => {
+                    console.log(data)
+                    this.setState({editMode: false})
+                }
             })
         )
-
     }
 }
 
