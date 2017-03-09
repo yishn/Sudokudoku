@@ -181,8 +181,8 @@ body {
         position: absolute;
         width: 6em;
         height: 6em;
-        margin-top: -3em;
-        margin-left: -3em;
+        margin-top: calc(-3em - 5px);
+        margin-left: calc(-3em - 5px);
         border: 5px solid #4B464A;
         background: #4B464A;
         color: white;

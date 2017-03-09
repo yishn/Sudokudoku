@@ -12,7 +12,9 @@ class App extends Component {
         this.state = {
             loadingProgress: 0,
             puzzle: null,
-            editMode: false
+
+            cellEditorPosition: [0, 0],
+            editMode: null
         }
     }
 
@@ -43,17 +45,28 @@ class App extends Component {
                 progress: state.loadingProgress
             })
             : h(SudokuGrid, {
-                app: this,
-                puzzle: state.puzzle
+                puzzle: state.puzzle,
+
+                onCellClick: evt => {
+                    let {vertex: [x, y]} = evt
+                    let target = document.querySelector(`#sudoku-grid .pos-${x}-${y}`)
+                    let rect = target.getBoundingClientRect()
+                    let left = (rect.left + rect.right) / 2
+                    let top = (rect.top + rect.bottom) / 2
+
+                    this.setState({
+                        cellEditorPosition: [left, top],
+                        editMode: [x, y]
+                    })
+                }
             }),
             h(CellEditor, {
                 excluded: [2, 3, 9],
-                position: [438, 252],
-                show: state.editMode,
+                position: state.cellEditorPosition,
+                show: state.editMode != null,
 
-                onSubmit: ({data}) => {
-                    console.log(data)
-                    this.setState({editMode: false})
+                onSubmit: evt => {
+                    this.setState({editMode: null})
                 }
             })
         )

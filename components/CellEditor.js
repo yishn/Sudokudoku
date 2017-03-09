@@ -9,6 +9,10 @@ class CellEditor extends Component {
         }
     }
 
+    componentWillReceiveProps({excluded}) {
+        this.setState({excluded})
+    }
+
     render({position: [left, top], show = false, onSubmit = () => {}}, {excluded}) {
         return h('section',
             {
@@ -21,7 +25,7 @@ class CellEditor extends Component {
                 h('ul', {},
                     [...Array(9)].map((_, i) => i + 1).map(i => h('li', {
                         class: {'excluded': excluded.includes(i)},
-                        
+
                         onClick: evt => {
                             evt.stopPropagation()
 

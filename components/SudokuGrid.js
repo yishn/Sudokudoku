@@ -2,7 +2,7 @@ const {h, Component} = require('preact')
 const Sudoku = require('../datatypes/sudoku')
 
 class SudokuGrid extends Component {
-    render({app, puzzle}) {
+    render({puzzle, onCellClick = () => {}}) {
         let contradiction = puzzle.getContradiction()
         let markup = puzzle.getTrivialMarkup()
 
@@ -21,11 +21,10 @@ class SudokuGrid extends Component {
                     : h('ul',
                         {
                             class: 'markup',
-                            onclick: () => {
-                                if (markup[y][x].length == 1) {
-                                    puzzle.set([x, y], markup[y][x][0])
-                                    app.setState({puzzle})
-                                }
+
+                            onClick: evt => {
+                                evt.vertex = [x, y]
+                                onCellClick(evt)
                             }
                         },
                         [...Array(9)].map((_, i) => i + 1).map(i => h('li', {
