@@ -4,7 +4,7 @@ const Sudoku = require('../datatypes/sudoku')
 
 class App extends Component {
     render() {
-        return h(SudokuGrid, {sudoku: new Sudoku().solve()})
+        return h(SudokuGrid, {sudoku: Sudoku.generatePuzzle()})
     }
 }
 

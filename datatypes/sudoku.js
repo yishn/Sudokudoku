@@ -3,10 +3,20 @@ let makeTuples = arr => arr.map(x => arr.map(y => [x, y])).reduce((sum, x) => [.
 let hasDuplicates = arr => arr.sort().some((x, i) => i > 0 && arr[i - 1] === x)
 let equals = v => w => v[0] === w[0] && v[1] === w[1]
 let random = n => Math.floor(Math.random() * n)
-let swap = (arr, i, j) => ([arr[i], arr[j]] = [arr[j], arr[i]])
+let swap = (arr, i, j) => ([arr[i], arr[j]] = [arr[j], arr[i]], arr)
 let shuffle = arr => (range(arr.length).map(i => arr.length - i).forEach(i => swap(arr, i - 1, random(i))), arr)
 
-let grid = makeTuples(range(9))
+let _grid = makeTuples(range(9))
+let _boxes = [
+    // Rows
+    ...range(9).map(i => range(9).map(j => [i, j])),
+    // Columns
+    ...range(9).map(i => range(9).map(j => [j, i])),
+    // Squares
+    ...makeTuples([0, 3, 6]).map(([tx, ty]) =>
+        makeTuples(range(3)).map(([i, j]) => [i + ty, j + tx])
+    )
+]
 
 class Sudoku {
     constructor(arrangement = {}) {
@@ -14,7 +24,7 @@ class Sudoku {
         this.excluded = {}
         this.solids = []
 
-        for (let v of grid) {
+        for (let v of _grid) {
             this.arrangement[v] = arrangement[v] || null
             this.excluded[v] = []
         }
@@ -47,23 +57,14 @@ class Sudoku {
         return null
     }
 
-    getBoxes(vertex = null) {
-        return [
-            // Rows
-            ...range(9).map(i => range(9).map(j => [i, j])),
-            // Columns
-            ...range(9).map(i => range(9).map(j => [j, i])),
-            // Squares
-            ...makeTuples([0, 3, 6]).map(([tx, ty]) =>
-                makeTuples(range(3)).map(([i, j]) => [i + ty, j + tx])
-            )
-        ].filter(box => !vertex || box.some(equals(vertex)))
+    getBoxes(vertex) {
+        return _boxes.filter(box => !vertex || box.some(equals(vertex)))
     }
 
     getTrivialMarkup() {
         let result = {}
 
-        for (let v of grid) {
+        for (let v of _grid) {
             result[v] = range(9).map(i => i + 1)
 
             for (let box of this.getBoxes(v)) {
@@ -78,7 +79,7 @@ class Sudoku {
     }
 
     solve() {
-        let emptyVertices = grid.filter(v => this.arrangement[v] == null)
+        let emptyVertices = _grid.filter(v => this.arrangement[v] == null)
         if (emptyVertices.length == 0 && !this.hasContradictions()) return this
 
         for (let vertex of emptyVertices) {
@@ -101,37 +102,45 @@ class Sudoku {
     }
 }
 
-Sudoku.generatePuzzle = function() {
+Sudoku.generatePuzzle = function(options = {}) {
+    let {timeout = 2000, sparsity = 3, maximum = 50} = options
     let puzzle = new Sudoku().solve()
+    let notEmpty = v => puzzle.arrangement[v] != null
+    let startTime = Date.now()
     let i = 0
 
-    for (let vertex of grid) {
+    for (let vertex of shuffle([..._grid])) {
         let number = puzzle.arrangement[vertex]
         let boxes = puzzle.getBoxes(vertex)
-        let feasible = true
+        let feasible = boxes.some(box => box.filter(notEmpty).length === 9)
 
-        if (boxes.some(box => box.filter(v => puzzle.arrangement[v] != null).length < 4)) {
-            feasible = false
-        }
+        if (boxes.some(box => box.filter(notEmpty).length <= sparsity))
+            continue
 
-        if (!feasible) continue
+        if (!feasible) {
+            // Check for multiple solutions
 
-        for (let n = 1; n <= 9; n++) {
-            if (n === number) continue
-            puzzle.arrangement[vertex] = n
+            feasible = true
 
-            if (puzzle.solve() != null) {
-                feasible = false
-                break
+            for (let n = 1; n <= 9; n++) {
+                if (n === number) continue
+                puzzle.arrangement[vertex] = n
+
+                if (Date.now() - startTime > timeout || puzzle.solve() != null) {
+                    feasible = false
+                    break
+                }
             }
         }
 
-        if (feasible) i++
         puzzle.arrangement[vertex] = feasible ? null : number
 
+        if (feasible) i++
         console.log(vertex, feasible, i)
-        if (i >= 50) break
+        if (i >= maximum) break
     }
+
+    puzzle.solids = _grid.filter(v => puzzle.arrangement[v] != null)
 
     return puzzle
 }
