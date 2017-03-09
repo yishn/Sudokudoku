@@ -14,10 +14,17 @@ class App extends Component {
     }
 
     componentDidMount() {
-        setTimeout(() => {
-            let puzzle = Sudoku.generatePuzzle()
+        let worker = new Worker('workers/puzzle-generator-bundle.js')
+
+        worker.addEventListener('message', evt => {
+            let [arrangement, solids] = evt.data
+            let puzzle = new Sudoku(arrangement)
+            puzzle.solids = solids
+
             this.setState({puzzle})
-        }, 1000)
+        })
+
+        worker.postMessage('')
     }
 
     render(_, {puzzle}) {
