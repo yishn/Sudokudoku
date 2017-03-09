@@ -122,11 +122,12 @@ class Sudoku {
 Sudoku.vertexEquals = v => w => v[0] === w[0] && v[1] === w[1]
 
 Sudoku.generatePuzzle = function(options = {}) {
-    let {timeout = Infinity, givens = 0} = options
+    let {timeout = Infinity, givens = 0, onProgress = () => {}} = options
     let puzzle = new Sudoku().solve()
     let notEmpty = v => puzzle.get(v) != null
     let startTime = Date.now()
     let i = 0
+    let n = 0
 
     for (let vertex of shuffle([..._grid])) {
         let number = puzzle.get(vertex)
@@ -143,7 +144,7 @@ Sudoku.generatePuzzle = function(options = {}) {
                 puzzle.set(vertex, n + 1)
 
                 try {
-                    feasible = puzzle.solve({timeout: 500}) == null
+                    feasible = puzzle.solve({timeout: 1000}) == null
                 } catch (err) {
                     feasible = false
                 }
@@ -159,6 +160,8 @@ Sudoku.generatePuzzle = function(options = {}) {
 
         if (feasible) i++
         if (i >= 81 - givens) break
+
+        onProgress(++n / _grid.length)
     }
 
     puzzle.solids = _grid.filter(v => puzzle.get(v) != null)

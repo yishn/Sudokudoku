@@ -23,11 +23,26 @@ body {
     position: absolute;
     top: 50%;
     width: 100%;
-    margin-top: -20px;
+    margin-top: -50px;
+}
+
+#throbber .progress {
+        position: relative;
+        height: 5px;
+        width: 200px;
+        margin: 2em auto 1em;
+        background: #FFC09C;
+    }
+    #throbber .progress .bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background: #A26E68;
+        transition: width .2s;
 }
 
 #throbber p {
-    margin-top: 1em;
     font-size: 1.2em;
     text-align: center;
 }
@@ -128,8 +143,9 @@ body {
     #sudoku-grid ol > li.contradiction {
         background: #E3423E;
         color: #FFECB1;
-    }
-    #sudoku-grid ol > li .markup {
+}
+
+#sudoku-grid ol > li .markup {
         list-style: none;
         overflow: hidden;
     }
@@ -144,4 +160,4 @@ body {
     }
     #sudoku-grid ol > li .markup li.excluded {
         visibility: hidden;
-    }
+}

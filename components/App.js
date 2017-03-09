@@ -9,6 +9,7 @@ class App extends Component {
         super()
 
         this.state = {
+            loadingProgress: 0,
             puzzle: null
         }
     }
@@ -17,20 +18,26 @@ class App extends Component {
         let worker = new Worker('workers/puzzle-generator-bundle.js')
 
         worker.addEventListener('message', evt => {
-            let [arrangement, solids] = evt.data
-            let puzzle = new Sudoku(arrangement)
-            puzzle.solids = solids
+            let {percent, puzzle} = evt.data
 
-            this.setState({puzzle})
+            if (puzzle != null) {
+                let [arrangement, solids] = puzzle
+                let p = new Sudoku(arrangement)
+                p.solids = solids
+
+                this.setState({puzzle: p})
+            } else {
+                this.setState({loadingProgress: percent})
+            }
         })
 
         worker.postMessage('')
     }
 
-    render(_, {puzzle}) {
+    render(_, {loadingProgress, puzzle}) {
         return h('section', {id: 'root'},
             puzzle == null
-            ? h(Throbber)
+            ? h(Throbber, {loadingProgress})
             : h(SudokuGrid, {
                 app: this,
                 puzzle

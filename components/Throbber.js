@@ -39,12 +39,15 @@ class Throbber extends Component {
         clearInterval(this.ellipsisCounterId)
     }
 
-    render(_, {textCounter, ellipsisCounter}) {
+    render({loadingProgress}, {textCounter, ellipsisCounter}) {
         return h('section', {id: 'throbber'},
             h('div', {class: 'sk-cube-grid'},
                 [...Array(9)].map((_, i) =>
                     h('div', {class: `sk-cube sk-cube${i + 1}`})
                 )
+            ),
+            h('div', {class: 'progress'},
+                h('div', {class: 'bar', style: {width: Math.round(loadingProgress * 100) + '%'}})
             ),
             h('p', {},
                 h('span', {style: {visibility: 'hidden'}}, Array(ellipsisCounter).fill('.').join('')),
