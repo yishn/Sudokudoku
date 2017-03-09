@@ -53,4 +53,11 @@ body {
         font-weight: bold;
         color: #4B464A;
         cursor: default;
-}
+    }
+    #sudoku-grid ol li.highlight div {
+        background: #FF9386;
+    }
+    #sudoku-grid ol li.contradiction div {
+        background: #E3423E;
+        color: #FFECB1;
+    }

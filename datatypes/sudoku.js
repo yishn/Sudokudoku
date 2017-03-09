@@ -1,7 +1,6 @@
 let range = n => [...Array(n)].map((_, i) => i)
 let makeTuples = arr => arr.map(x => arr.map(y => [x, y])).reduce((sum, x) => [...sum, ...x], [])
 let hasDuplicates = arr => arr.sort().some((x, i) => i > 0 && arr[i - 1] === x)
-let equals = v => w => v[0] === w[0] && v[1] === w[1]
 let random = n => Math.floor(Math.random() * n)
 let swap = (arr, i, j) => ([arr[i], arr[j]] = [arr[j], arr[i]], arr)
 let shuffle = arr => (range(arr.length).map(i => arr.length - i).forEach(i => swap(arr, i - 1, random(i))), arr)
@@ -46,7 +45,7 @@ class Sudoku {
                 if (this.arrangement[v] == null) continue
 
                 for (let w of box) {
-                    if (equals(v)(w) || this.arrangement[v] !== this.arrangement[w])
+                    if (Sudoku.vertexEquals(v)(w) || this.arrangement[v] !== this.arrangement[w])
                         continue
 
                     return [v, w]
@@ -54,11 +53,11 @@ class Sudoku {
             }
         }
 
-        return null
+        return []
     }
 
     getBoxes(vertex) {
-        return _boxes.filter(box => !vertex || box.some(equals(vertex)))
+        return _boxes.filter(box => !vertex || box.some(Sudoku.vertexEquals(vertex)))
     }
 
     getTrivialMarkup() {
@@ -101,6 +100,8 @@ class Sudoku {
         return null
     }
 }
+
+Sudoku.vertexEquals = v => w => v[0] === w[0] && v[1] === w[1]
 
 Sudoku.generatePuzzle = function(options = {}) {
     let {timeout = 2000, sparsity = 3, maximum = 50} = options
