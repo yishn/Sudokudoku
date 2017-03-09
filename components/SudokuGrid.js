@@ -2,7 +2,7 @@ const {h, Component} = require('preact')
 const Sudoku = require('../datatypes/sudoku')
 
 class SudokuGrid extends Component {
-    render({sudoku}) {
+    render({app, sudoku}) {
         let contradiction = sudoku.getContradiction()
         let markup = sudoku.getTrivialMarkup()
 
@@ -18,7 +18,16 @@ class SudokuGrid extends Component {
                     },
                     sudoku.arrangement[[x, y]] != null
                     ? h('div', {class: 'number'}, sudoku.arrangement[[x, y]])
-                    : h('ul', {class: 'markup'},
+                    : h('ul',
+                        {
+                            class: 'markup',
+                            onclick: () => {
+                                if (markup[[x, y]].length == 1) {
+                                    sudoku.arrangement[[x, y]] = markup[[x, y]][0]
+                                    app.setState({sudoku})
+                                }
+                            }
+                        },
                         [...Array(9)].map((_, i) => i + 1).map(i => h('li', {
                             class: {
                                 'excluded': !markup[[x, y]].includes(i)

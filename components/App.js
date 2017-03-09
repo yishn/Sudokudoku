@@ -3,8 +3,19 @@ const SudokuGrid = require('./SudokuGrid')
 const Sudoku = require('../datatypes/sudoku')
 
 class App extends Component {
-    render() {
-        return h(SudokuGrid, {sudoku: Sudoku.generatePuzzle()})
+    constructor() {
+        super()
+        
+        this.state = {
+            sudoku: Sudoku.generatePuzzle()
+        }
+    }
+
+    render(_, {sudoku}) {
+        return h(SudokuGrid, {
+            app: this,
+            sudoku
+        })
     }
 }
 

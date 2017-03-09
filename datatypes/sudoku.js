@@ -1,6 +1,6 @@
 let range = n => [...Array(n)].map((_, i) => i)
 let makeTuples = arr => arr.map(x => arr.map(y => [x, y])).reduce((sum, x) => [...sum, ...x], [])
-let hasDuplicates = arr => arr.sort().some((x, i) => i > 0 && arr[i - 1] === x)
+let hasDuplicates = arr => arr.sort().some((x, i) => i > 0 && x != null && arr[i - 1] === x)
 let random = n => Math.floor(Math.random() * n)
 let swap = (arr, i, j) => ([arr[i], arr[j]] = [arr[j], arr[i]], arr)
 let shuffle = arr => (range(arr.length).map(i => arr.length - i).forEach(i => swap(arr, i - 1, random(i))), arr)
@@ -35,10 +35,9 @@ class Sudoku {
         return puzzle
     }
 
-    hasContradictions() {
-        return this.getBoxes().some(box =>
-            hasDuplicates(box.map(v => this.arrangement[v]).filter(x => x != null))
-        )
+    hasContradictions(box) {
+        if (box != null) return hasDuplicates(box.map(v => this.arrangement[v]))
+        return this.getBoxes().some(this.hasContradictions.bind(this))
     }
 
     getContradiction() {
@@ -59,7 +58,8 @@ class Sudoku {
     }
 
     getBoxes(vertex) {
-        return _boxes.filter(box => !vertex || box.some(Sudoku.vertexEquals(vertex)))
+        if (!vertex) return _boxes
+        return _boxes.filter(box => box.some(Sudoku.vertexEquals(vertex)))
     }
 
     getTrivialMarkup() {
@@ -80,11 +80,13 @@ class Sudoku {
     }
 
     solve() {
-        let emptyVertices = _grid.filter(v => this.arrangement[v] == null)
-        if (emptyVertices.length == 0 && !this.hasContradictions()) return this
+        let noEmptyVertices = true
 
-        for (let vertex of emptyVertices) {
+        for (let vertex of _grid) {
+            if (this.arrangement[vertex] != null) continue
+
             let neighbor = this.clone()
+            noEmptyVertices = false
 
             for (let number of shuffle(range(9).map(i => i + 1))) {
                 neighbor.arrangement[vertex] = number
@@ -98,6 +100,9 @@ class Sudoku {
 
             return null
         }
+
+        if (noEmptyVertices)
+            return this
 
         return null
     }
