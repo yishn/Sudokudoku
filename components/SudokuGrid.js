@@ -16,22 +16,22 @@ class SudokuGrid extends Component {
                             'contradiction': contradiction.some(Sudoku.vertexEquals([x, y]))
                         }
                     },
-                    sudoku.arrangement[[x, y]] != null
-                    ? h('div', {class: 'number'}, sudoku.arrangement[[x, y]])
+                    sudoku.get([x, y]) != null
+                    ? h('div', {class: 'number'}, sudoku.get([x, y]))
                     : h('ul',
                         {
                             class: 'markup',
                             onclick: () => {
-                                if (markup[[x, y]].length == 1) {
-                                    sudoku.arrangement[[x, y]] = markup[[x, y]][0]
+                                if (markup[y][x].length == 1) {
+                                    sudoku.set([x, y], markup[y][x][0])
                                     app.setState({sudoku})
                                 }
                             }
                         },
                         [...Array(9)].map((_, i) => i + 1).map(i => h('li', {
                             class: {
-                                'excluded': !markup[[x, y]].includes(i)
-                                    || sudoku.excluded[[x, y]].includes(i)
+                                'excluded': !markup[y][x].includes(i)
+                                    || sudoku.excluded[y][x].includes(i)
                             }
                         }, i))
                     )

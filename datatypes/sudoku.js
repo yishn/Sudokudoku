@@ -3,14 +3,15 @@ let makeTuples = arr => arr.map(x => arr.map(y => [x, y])).reduce((sum, x) => [.
 let hasDuplicates = arr => arr.sort().some((x, i) => i > 0 && x != null && arr[i - 1] === x)
 let random = n => Math.floor(Math.random() * n)
 let swap = (arr, i, j) => ([arr[i], arr[j]] = [arr[j], arr[i]], arr)
-let shuffle = arr => (range(arr.length).map(i => arr.length - i).forEach(i => swap(arr, i - 1, random(i))), arr)
+let shuffle = arr => (arr.forEach((_, i) => swap(arr, arr.length - i - 1, random(arr.length - i))), arr)
 
-let _grid = makeTuples(range(9))
+let range9 = range(9)
+let _grid = makeTuples(range9)
 let _boxes = [
     // Rows
-    ...range(9).map(i => range(9).map(j => [i, j])),
+    ...range9.map(i => range9.map(j => [i, j])),
     // Columns
-    ...range(9).map(i => range(9).map(j => [j, i])),
+    ...range9.map(i => range9.map(j => [j, i])),
     // Squares
     ...makeTuples([0, 3, 6]).map(([tx, ty]) =>
         makeTuples(range(3)).map(([i, j]) => [i + ty, j + tx])
@@ -18,15 +19,23 @@ let _boxes = [
 ]
 
 class Sudoku {
-    constructor(arrangement = {}) {
-        this.arrangement = {}
-        this.excluded = {}
+    constructor(arrangement = null) {
+        this.arrangement = []
+        this.excluded = []
         this.solids = []
 
-        for (let v of _grid) {
-            this.arrangement[v] = arrangement[v] || null
-            this.excluded[v] = []
+        for (let y = 0; y < 9; y++) {
+            this.arrangement[y] = arrangement ? [...arrangement[y]] : Array(9).fill(null)
+            this.excluded[y] = [...Array(9)].map(_ => [])
         }
+    }
+
+    set([x, y], number) {
+        this.arrangement[y][x] = number
+    }
+
+    get([x, y]) {
+        return this.arrangement[y][x]
     }
 
     clone() {
@@ -36,17 +45,17 @@ class Sudoku {
     }
 
     hasContradictions(box) {
-        if (box != null) return hasDuplicates(box.map(v => this.arrangement[v]))
+        if (box != null) return hasDuplicates(box.map(v => this.get(v)))
         return this.getBoxes().some(this.hasContradictions.bind(this))
     }
 
     getContradiction() {
         for (let box of this.getBoxes()) {
             for (let v of box) {
-                if (this.arrangement[v] == null) continue
+                if (this.get(v) == null) continue
 
                 for (let w of box) {
-                    if (Sudoku.vertexEquals(v)(w) || this.arrangement[v] !== this.arrangement[w])
+                    if (Sudoku.vertexEquals(v)(w) || this.get(v) !== this.get(w))
                         continue
 
                     return [v, w]
@@ -63,15 +72,15 @@ class Sudoku {
     }
 
     getTrivialMarkup() {
-        let result = {}
+        let result = [...Array(9)].map(_ => Array(9).fill(null))
 
-        for (let v of _grid) {
-            result[v] = range(9).map(i => i + 1)
+        for (let [x, y] of _grid) {
+            result[y][x] = range9.map(i => i + 1)
 
-            for (let box of this.getBoxes(v)) {
+            for (let box of this.getBoxes([x, y])) {
                 for (let w of box) {
-                    let index = result[v].indexOf(this.arrangement[w])
-                    if (index >= 0) result[v].splice(index, 1)
+                    let index = result[y][x].indexOf(this.get(w))
+                    if (index >= 0) result[y][x].splice(index, 1)
                 }
             }
         }
@@ -83,27 +92,25 @@ class Sudoku {
         let noEmptyVertices = true
 
         for (let vertex of _grid) {
-            if (this.arrangement[vertex] != null) continue
+            if (this.get(vertex) != null) continue
 
             let neighbor = this.clone()
             noEmptyVertices = false
 
-            for (let number of shuffle(range(9).map(i => i + 1))) {
-                neighbor.arrangement[vertex] = number
+            for (let number of shuffle(range(9))) {
+                neighbor.set(vertex, number + 1)
                 if (neighbor.hasContradictions()) continue
 
                 let result = neighbor.solve()
                 if (result != null) return result
 
-                neighbor.arrangement[vertex] = null
+                neighbor.set(vertex, null)
             }
 
             return null
         }
 
-        if (noEmptyVertices)
-            return this
-
+        if (noEmptyVertices) return this
         return null
     }
 }
@@ -111,14 +118,14 @@ class Sudoku {
 Sudoku.vertexEquals = v => w => v[0] === w[0] && v[1] === w[1]
 
 Sudoku.generatePuzzle = function(options = {}) {
-    let {timeout = 2000, sparsity = 3, givens = 31} = options
+    let {timeout = 5000, sparsity = -1, givens = 0} = options
     let puzzle = new Sudoku().solve()
-    let notEmpty = v => puzzle.arrangement[v] != null
+    let notEmpty = v => puzzle.get(v) != null
     let startTime = Date.now()
     let i = 0
 
     for (let vertex of shuffle([..._grid])) {
-        let number = puzzle.arrangement[vertex]
+        let number = puzzle.get(vertex)
         let boxes = puzzle.getBoxes(vertex)
         let feasible = boxes.some(box => box.filter(notEmpty).length === 9)
 
@@ -130,9 +137,9 @@ Sudoku.generatePuzzle = function(options = {}) {
 
             feasible = true
 
-            for (let n = 1; n <= 9; n++) {
-                if (n === number) continue
-                puzzle.arrangement[vertex] = n
+            for (let n of shuffle(range(9))) {
+                if (n + 1 === number) continue
+                puzzle.set(vertex, n + 1)
 
                 if (Date.now() - startTime > timeout || puzzle.solve() != null) {
                     feasible = false
@@ -141,14 +148,14 @@ Sudoku.generatePuzzle = function(options = {}) {
             }
         }
 
-        puzzle.arrangement[vertex] = feasible ? null : number
+        puzzle.set(vertex, feasible ? null : number)
 
         if (feasible) i++
         console.log(vertex, feasible, i)
         if (i >= 81 - givens) break
     }
 
-    puzzle.solids = _grid.filter(v => puzzle.arrangement[v] != null)
+    puzzle.solids = _grid.filter(v => puzzle.get(v) != null)
 
     return puzzle
 }
