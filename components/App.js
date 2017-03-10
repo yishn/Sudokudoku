@@ -71,12 +71,13 @@ class App extends Component {
 
                 onCellClick: ({vertex}) => {
                     let [x, y] = vertex
+                    let allowed = getAllowed(vertex)
 
                     if (state.puzzle.get(vertex) == null) {
-                        if (markup[y][x].length == 1) {
+                        if (allowed.length == 1) {
                             // Fill cell
 
-                            state.puzzle.set(vertex, markup[y][x][0])
+                            state.puzzle.set(vertex, allowed[0])
                             this.setState({puzzle: state.puzzle})
                         } else {
                             // Show cell editor

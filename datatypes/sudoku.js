@@ -140,7 +140,7 @@ class Sudoku {
 Sudoku.vertexEquals = v => w => v[0] === w[0] && v[1] === w[1]
 
 Sudoku.generatePuzzle = function(options = {}) {
-    let {timeout = 500, givens = 0, onProgress = () => {}} = options
+    let {timeout = Infinity, givens = 0, onProgress = () => {}} = options
     let puzzle = new Sudoku().solve()
     let notEmpty = v => puzzle.get(v) != null
     let startTime = Date.now()
