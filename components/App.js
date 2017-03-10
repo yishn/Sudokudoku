@@ -5,6 +5,8 @@ const Throbber = require('./Throbber')
 const SudokuGrid = require('./SudokuGrid')
 const CellEditor = require('./CellEditor')
 
+let numbers = [...Array(9)].map((_, i) => i + 1)
+
 class App extends Component {
     constructor() {
         super()
@@ -14,7 +16,8 @@ class App extends Component {
             puzzle: null,
 
             cellEditorPosition: [0, 0],
-            editVertex: null
+            editVertex: [0, 0],
+            editMode: false
         }
     }
 
@@ -38,11 +41,25 @@ class App extends Component {
         worker.postMessage(null)
     }
 
-    render(_, state) {
-        let markup = state.puzzle ? state.puzzle.getCurrentMarkup() : null
-        let numbers = [...Array(9)].map((_, i) => i + 1)
+    showCellEditor([x, y]) {
+        let element = document.querySelector(`#sudoku-grid .pos-${x}-${y}`)
+        let rect = element.getBoundingClientRect()
+        let left = (rect.left + rect.right) / 2
+        let top = (rect.top + rect.bottom) / 2
 
-        let getExcluded = ([x, y]) => numbers.filter(i => !markup[y][x].includes(i))
+        this.setState({
+            cellEditorPosition: [left, top],
+            editVertex: [x, y],
+            editMode: true
+        })
+    }
+
+    render(_, state) {
+        let markup = state.puzzle ? state.puzzle.getTrivialMarkup() : null
+
+        let getExcluded = ([x, y]) => state.puzzle ? state.puzzle.excluded[y][x] : []
+        let getDisabled = ([x, y]) => markup ? numbers.filter(i => !markup[y][x].includes(i)) : []
+        let getAllowed = ([x, y]) => markup ? markup[y][x].filter(i => !getExcluded([x, y]).includes(i)) : numbers
 
         return h('section', {id: 'root'},
             state.puzzle == null
@@ -52,26 +69,53 @@ class App extends Component {
             : h(SudokuGrid, {
                 puzzle: state.puzzle,
 
-                onCellClick: evt => {
-                    let {vertex: [x, y]} = evt
-                    let target = document.querySelector(`#sudoku-grid .pos-${x}-${y}`)
-                    let rect = target.getBoundingClientRect()
-                    let left = (rect.left + rect.right) / 2
-                    let top = (rect.top + rect.bottom) / 2
+                onCellClick: ({vertex}) => {
+                    let [x, y] = vertex
 
-                    this.setState({
-                        cellEditorPosition: [left, top],
-                        editVertex: [x, y]
-                    })
+                    if (state.puzzle.get(vertex) == null) {
+                        if (markup[y][x].length == 1) {
+                            // Fill cell
+
+                            state.puzzle.set(vertex, markup[y][x][0])
+                            this.setState({puzzle: state.puzzle})
+                        } else {
+                            // Show cell editor
+
+                            this.showCellEditor(vertex)
+                        }
+                    } else {
+                        // Clear cell
+
+                        state.puzzle.set(vertex, null)
+                        state.puzzle.excluded[y][x] = []
+
+                        this.setState({puzzle: state.puzzle})
+                    }
                 }
             }),
             h(CellEditor, {
-                excluded: state.editVertex ? getExcluded(state.editVertex) : [],
+                excluded: getExcluded(state.editVertex),
+                disabled: getDisabled(state.editVertex),
                 position: state.cellEditorPosition,
-                show: state.editVertex != null,
+                show: state.editMode,
 
                 onSubmit: evt => {
-                    this.setState({editVertex: null})
+                    let allowed = getAllowed(state.editVertex).filter(i => !evt.data.includes(i))
+
+                    if (allowed.length == 1) {
+                        // Fill cell
+
+                        state.puzzle.set(state.editVertex, allowed[0])
+                    } else {
+                        // Update excluded numbers
+
+                        let [x, y] = state.editVertex
+                        let excluded = evt.data.filter(i => markup[y][x].includes(i))
+
+                        state.puzzle.excluded[y][x] = excluded
+                    }
+
+                    this.setState({puzzle: state.puzzle, editMode: false})
                 }
             })
         )

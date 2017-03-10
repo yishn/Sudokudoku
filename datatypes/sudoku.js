@@ -87,6 +87,10 @@ class Sudoku {
                     if (index >= 0) result[y][x].splice(index, 1)
                 }
             }
+
+            if (this.get([x, y]) != null) {
+                result[y][x].push(this.get([x, y]))
+            }
         }
 
         return result

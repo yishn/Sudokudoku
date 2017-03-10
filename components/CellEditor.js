@@ -13,7 +13,7 @@ class CellEditor extends Component {
         this.setState({excluded})
     }
 
-    render({position: [left, top], show = false, onSubmit = () => {}}, {excluded}) {
+    render({position: [left, top], show = false, disabled = [], onSubmit = () => {}}, {excluded}) {
         return h('section',
             {
                 id: 'cell-editor',
@@ -24,9 +24,14 @@ class CellEditor extends Component {
             h('section', {class: 'inner', style: {left, top}},
                 h('ul', {},
                     [...Array(9)].map((_, i) => i + 1).map(i => h('li', {
-                        class: {'excluded': excluded.includes(i)},
+                        class: {
+                            'excluded': excluded.includes(i) && !disabled.includes(i),
+                            'disabled': disabled.includes(i)
+                        },
 
                         onClick: evt => {
+                            if (disabled.includes(i)) return
+
                             evt.stopPropagation()
 
                             this.setState(state => ({

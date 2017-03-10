@@ -14,19 +14,19 @@ class SudokuGrid extends Component {
                             [`pos-${x}-${y}`]: true,
                             'solid': puzzle.solids.some(Sudoku.vertexEquals([x, y])),
                             'contradiction': contradiction.some(Sudoku.vertexEquals([x, y]))
+                        },
+
+                        onClick: evt => {
+                            if (puzzle.solids.some(Sudoku.vertexEquals([x, y])))
+                                return
+
+                            evt.vertex = [x, y]
+                            onCellClick(evt)
                         }
                     },
                     puzzle.get([x, y]) != null
                     ? h('div', {class: 'number'}, puzzle.get([x, y]))
-                    : h('ul',
-                        {
-                            class: 'markup',
-
-                            onClick: evt => {
-                                evt.vertex = [x, y]
-                                onCellClick(evt)
-                            }
-                        },
+                    : h('ul', {class: 'markup'},
                         [...Array(9)].map((_, i) => i + 1).map(i => h('li', {
                             class: {
                                 'excluded': !markup[y][x].includes(i)

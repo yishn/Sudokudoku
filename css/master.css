@@ -242,4 +242,8 @@ body {
     }
     #cell-editor .inner li.excluded:hover::before {
         background: #8F8A8E;
+    }
+    #cell-editor .inner li.disabled {
+        visibility: hidden;
+        cursor: default;
 }
