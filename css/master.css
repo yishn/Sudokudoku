@@ -114,6 +114,9 @@ body {
         cursor: pointer;
         transition: background .2s;
     }
+    #sudoku-grid ol > li.highlight, #sudoku-grid ol > li.solid.highlight {
+        background: #FFA389;
+    }
     #sudoku-grid ol > li:hover {
         background: #FF9386;
     }
@@ -136,9 +139,6 @@ body {
     #sudoku-grid ol > li.solid .number {
         font-weight: bold;
         color: #4B464A;
-    }
-    #sudoku-grid ol > li.highlight {
-        background: #FF9386;
     }
     #sudoku-grid ol > li.contradiction {
         background: #E3423E;

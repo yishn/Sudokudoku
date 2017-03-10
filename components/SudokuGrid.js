@@ -6,11 +6,12 @@ class SudokuGrid extends Component {
         super()
 
         this.state = {
-            highlightNumbers: []
+            highlightNumbers: [],
+            highlightFilled: false
         }
     }
 
-    render({puzzle, onCellClick = () => {}}, {highlightNumbers}) {
+    render({puzzle, onCellClick = () => {}}, {highlightNumbers, highlightFilled}) {
         let contradiction = puzzle.getContradiction()
         let markup = puzzle.getCurrentMarkup()
 
@@ -24,7 +25,7 @@ class SudokuGrid extends Component {
                             'contradiction': markup[y][x].length == 0
                                 || contradiction.some(Sudoku.vertexEquals([x, y])),
                             'highlight': puzzle.get([x, y]) != null
-                                ? highlightNumbers.includes(puzzle.get([x, y]))
+                                ? highlightFilled && highlightNumbers.includes(puzzle.get([x, y]))
                                 : markup[y][x].some(i => highlightNumbers.includes(i))
                         },
 
@@ -36,16 +37,14 @@ class SudokuGrid extends Component {
                             onCellClick(evt)
                         },
                         onMouseEnter: () => {
-                            this.highlightId = setTimeout(() => {
-                                let number = puzzle.get([x, y])
+                            let number = puzzle.get([x, y])
 
-                                this.setState({
-                                    highlightNumbers: number == null ? markup[y][x] : [number]
-                                })
-                            }, 1000)
+                            this.setState({
+                                highlightNumbers: number == null ? markup[y][x] : [number],
+                                highlightFilled: number != null
+                            })
                         },
                         onMouseLeave: () => {
-                            clearTimeout(this.highlightId)
                             this.setState({highlightNumbers: []})
                         }
                     },

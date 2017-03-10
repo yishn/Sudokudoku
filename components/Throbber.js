@@ -4,6 +4,7 @@ let texts = [
     'Loading Sudokudoku',
     'Generating puzzle',
     'Removing numbers',
+    'This may take a while',
     'Adjusting difficulty',
     'Making puzzle extra difficult',
     'Just for you',
@@ -11,7 +12,8 @@ let texts = [
     'It should be done soon',
     'Very soon',
     'I promise',
-    'There we go'
+    'Just a little bit',
+    'Here we go'
 ]
 
 class Throbber extends Component {
