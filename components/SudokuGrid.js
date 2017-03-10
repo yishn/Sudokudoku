@@ -14,6 +14,7 @@ class SudokuGrid extends Component {
                             [`pos-${x}-${y}`]: true,
                             'solid': puzzle.solids.some(Sudoku.vertexEquals([x, y])),
                             'contradiction': contradiction.some(Sudoku.vertexEquals([x, y]))
+                                || markup[y][x].length == 0
                         },
 
                         onClick: evt => {
