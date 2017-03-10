@@ -2,7 +2,15 @@ const {h, Component} = require('preact')
 const Sudoku = require('../datatypes/sudoku')
 
 class SudokuGrid extends Component {
-    render({puzzle, onCellClick = () => {}}) {
+    constructor() {
+        super()
+
+        this.state = {
+            highlightNumbers: []
+        }
+    }
+
+    render({puzzle, onCellClick = () => {}}, {highlightNumbers}) {
         let contradiction = puzzle.getContradiction()
         let markup = puzzle.getCurrentMarkup()
 
@@ -13,8 +21,11 @@ class SudokuGrid extends Component {
                         class: {
                             [`pos-${x}-${y}`]: true,
                             'solid': puzzle.solids.some(Sudoku.vertexEquals([x, y])),
-                            'contradiction': contradiction.some(Sudoku.vertexEquals([x, y]))
-                                || markup[y][x].length == 0
+                            'contradiction': markup[y][x].length == 0
+                                || contradiction.some(Sudoku.vertexEquals([x, y])),
+                            'highlight': puzzle.get([x, y]) != null
+                                ? highlightNumbers.includes(puzzle.get([x, y]))
+                                : markup[y][x].some(i => highlightNumbers.includes(i))
                         },
 
                         onClick: evt => {
@@ -23,6 +34,19 @@ class SudokuGrid extends Component {
 
                             evt.vertex = [x, y]
                             onCellClick(evt)
+                        },
+                        onMouseEnter: () => {
+                            this.highlightId = setTimeout(() => {
+                                let number = puzzle.get([x, y])
+
+                                this.setState({
+                                    highlightNumbers: number == null ? markup[y][x] : [number]
+                                })
+                            }, 1000)
+                        },
+                        onMouseLeave: () => {
+                            clearTimeout(this.highlightId)
+                            this.setState({highlightNumbers: []})
                         }
                     },
                     puzzle.get([x, y]) != null
