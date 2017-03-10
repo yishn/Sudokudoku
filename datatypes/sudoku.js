@@ -187,4 +187,17 @@ Sudoku.generatePuzzle = function(options = {}) {
     return puzzle
 }
 
+Sudoku.parse = function(string) {
+    let arr = [...string]
+    let arrangement = [...Array(9)].map((_, i) =>
+        arr.slice(i * 9, (i + 1) * 9).map(x => x === '.' ? null : +x)
+    )
+
+    let puzzle = new Sudoku()
+    puzzle.arrangement = arrangement
+    puzzle.solids = puzzle.getGrid().filter(v => puzzle.get(v) != null)
+
+    return puzzle
+}
+
 module.exports = Sudoku
